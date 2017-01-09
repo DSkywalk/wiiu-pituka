@@ -8,6 +8,14 @@
 *.gch
 *.pch
 
+# wiituka
+source/wii/wpad_leds/__wpads.h
+source/linux/
+source/makefile.linux
+images_not_used/
+build/
+wiituka.dol
+
 # Libraries
 *.lib
 *.a
@@ -31,3 +39,4 @@
 # Debug files
 *.dSYM/
 *.su
+
