@@ -1,5 +1,7 @@
 # wiiu-pituka
-Wiituka-U
+Wiituka-U - https://github.com/DSkywalk/wiiu-pituka/wiki
+
+# Releases
 
 # compiled with some updated libs
 * devkitPPC_r28-i686-linux.tar.bz2
