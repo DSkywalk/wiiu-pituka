@@ -1,0 +1,379 @@
+************************************
+
+	WiituKa v0.98
+	Stable - Release
+
+************************************
+
+
+ Introduction:
+===============
+
+ The Amstrad CPC range was an 8bit microcomputer family released on June 21st, 1984. These computers 
+were sold as a complete bundle including a colour or green screen monitor and a main storage system. 
+CPC was an acronym of Colour Personal Computer. The first digit was a code for the main storage system; 
+'4' denoted a tape deck and '6' a 3-inch floppy disk drive. The Amstrad CPC range included the following 
+models:
+
+-	Amstrad CPC 464, 64Kb RAM
+-	Amstrad CPC 472, 64Kb RAM (only sold in Spain)
+-	Amstrad CPC 664, 64Kb RAM
+-	Amstrad CPC 6128, 128Kb RAM
+
+ The CPC series was very popular in Europe, mainly in the United Kingdom, France, Spain and Germany (where 
+the CPC was sold under the Schneider brand). Amstrad plc. entered the computing market with the CPC series. 
+They even dominated the European market with their PC clones the PC1512 and 1640. Sales of CPC units are 
+estimated at about 2 million.
+
+You are looking at a machine thats hardware was packed with its Z80A 4MHz processor, 4 channels of sound that 
+made for perfect atmospheres in games, and a very advanced graphical chip for its time: different graphical 
+modes and graphical resolutions changes whilst running. Very few machines have been as big as the CPC was, 
+it survived for more than 10 years and it's a beloved and well known machine by two generations of computing 
+fans that remember it.
+
+
+ About Wiituka:
+===============
+
+WiituKa is an Amstrad CPC6128 emulator for the Wii system based on my last work Pituka for GamePark32.
+
+My hope is that you enjoy this emulator and people who don't know this marvellous machine can enjoy it, even 
+today there are new remake releases, you only have to look at the NES remakes released for the GBA.
+
+
+WII Features:
+- A comfortable Interface that tries to resemble "Virtual Console"
+- With online support, download your games from coach.
+- First emulator with CPC Gunstick Emulation (Yeah!)
+
+
+ INSTALATION:
+==============
+
+ - COPY "apps" dir to your SD CARD.
+
+ - Create new directory for your ROMS, APPS\WIITUKA\DISKS and copy your ZIP files to the new directory.
+	Anyway, PituKa creates his need it directory automaticaly:
+
+		SD-CARD
+		|
+                |-----> APPS ---> WIITUKA (EMULATOR BINARY)
+                                  |
+		                  --------> DISKS (ROM FILES HERE)
+                                  |
+                                  --------> SAVES (SAVESTATES HERE)
+                                  |          
+                                  --------> SCREENS (YOUR SCREENSHOTS)
+
+ - Happy emulation ;D
+ 
+
+ CONTROLS:
+===========
+
+ There are 2 modes besides the KEYBOARD that is detected at the beginning:
+
+	MODE 1 JOYSTICK: 
+		
+		MOTE		:	AMSTRAD
+		-------------------------------------
+		<>^v (PAD)	:	JOY DIRECTIONS 
+		(2)		:	[FIRE]
+		(1)		:	[FIRE2]
+		(HOME)		:	PAUSE EMULATION / MENU 	
+
+
+
+	MODO 2 USER: (DEFAULT CFG)
+		
+		MOTE		:	AMSTRAD
+		-------------------------------------
+		<>^v (PAD)	:	CURSOR KEYS
+		(2)		:	[A]
+		(1)		:	SPACE
+		(HOME)		:	PAUSE EMULATION / MENU 	
+
+        You can redefine this keys using Keyboard-On-Screen and 
+        press Button B (on Key to Bind) + Any Button on your Wiimote / Wii Classic Control.
+
+
+	KEYBOARD:
+		USB		:	AMSTRAD
+		-------------------------------------
+		[º]		:	[|] 
+		[NP1], [NP2]	:	[F1], [F2]...
+
+	CLASSIC PAD:
+		- ALL KEYS ARE AVAILABLE TO BIND.
+
+
+          Problems using KEYBOARD:
+          -------------------------
+	   These problems arent fault of the emulator but also the support that we have
+	   of the KEYBOARD is simple at the moment (although perfectly stable),
+	   the problems detected are:
+
+            PROBLEM : The emulator detects my KEYBOARD that is perfectly connected
+		      but into the emulation dont have a response.
+	    SOLUTION: Change your USB KEYBOARD to other, some models are not fully compatible 
+		      with the Wii Drivers.
+
+
+        ROMLIST/MENU:
+		(A)	- RESET EMULATION, LOAD DISK AND AUTORUN.
+		(B)	- LOAD DISK ONLY.
+
+		(HOME)	- RETURN TO EMULATION (IN MAIN MENU)
+
+
+ Play a Game using Autorun:
+============================
+	Pituka emulates a real CPC even in code of the autorun i want to be accurate, to
+	load a disk and activate the AUTORUN from start menu, follow this steps:
+	- INSERT DISK -> [A]
+	- Select a Rom that you want load with [A] (with DSK extension of course).
+	- Now appear the file list that you can load, normally you may follow this preference order:
+	  BAS -> BIN -> . (WITHOUT EXTENSION) -> |CPM
+	- If you dont see any BAS file, you may search a BIN file and continues... if you dont see any type of file
+	  when you may selecct |CPM to load the game.
+	- When you have selected the file to load your game, you returned to start menu and just left reset CPC
+	  if you have got any game later. Press [START] to return to emulation.
+
+	- Some times when you load a game and selects the autorun file, when you return to emulation
+	  the autorun string dont appear, to appear change your PAD-MODE using [R], i cant fix this error
+	  because I dont have much time... sorry :(
+
+		
+	
+ Play a Game without Autorun:
+==============================
+	
+	Pituka emulates a real CPC, which means you have to do the same as you would with a real CPC to run 
+	a game. Con la suerte que en esta nueva version los poseedores de un CHATBOARD lo tienen mas comodo ;)
+
+	To play a game, you must insert a disk image and type two basic commands, let see what they are:
+
+		- To insert a disc image. press [START] and choose INSERT DISK in the main menu.
+
+		- Select a DSK and you'll be back in the main menu. Press [START] to return to the
+		 	emulation.
+
+		- Now you have to know what files the disc image has. It's easy, go to the virtual 
+			keyboard with [R] and type [C][A][T] , then press SELECT to execute that
+			command.
+
+		- Now, you'll see a files list. The important filetypes are BIN, BAS or without 
+			extension, Ex: ABADIA.BAS, GRYZOR.BIN, TETRIS.
+
+		- Now type [R][U][N]["] to execute a file. There is a tip to do this faster, look at 				                        the bottom.You can get the ["] symbol pressing the buttons [L] and the [2] vkey.
+
+		- Now type the name (you can include the extension if you want yo be sure what file are 
+			you running), for example: [G][R][Y][Z][O][R][.][B][I][N], and then press 
+			[RETURN].
+
+		- Tips time: type the name of the file and then place the cursor at the beginning of the 
+                        name. then press [CTRL] with the [A] button and without depress it, press [INTRO].
+                        This will then put [R][U][N]["] in front of the file name and launch the game.
+
+		- For some games you don't need to type the  RUN" command, they load with the |CPM command 
+                        They are easily detectable. If when you execute the CAT command, you get an error 
+                        (ignore, Cancel) then these games are protected, but don't worry about it, they 
+                        are even easier to execute, you only must type:
+			[|][C][P][M] and the Press [RETURN].
+			You can get the [|] symbol pressing the buttons [L] and then vkey to the RIGHT of [P].
+
+
+
+ How is save the configuration keys.
+================================================
+ The philosophy that follow the code of "Unique Game Save Keys" is:
+	- Once diffent config for DSK/ZIP file.
+	- The config is save and is load every time when you change your ROM.
+	- If the ROM dont have any config file this is create a new file with the actual
+	  config and it is load again.
+
+ Music Credits.
+=================
+ All music is Creative Commons or is authorized by the original author.
+
+  - Ultrasyd - Lost in Fractal Dimension.mp3 
+    http://8bitcollective.com/music/Ultrasyd/Lost+in+Fractal+Dimension/
+
+  - cerror - a beginning.mp3
+    http://8bitcollective.com/music/cerror/A+beginning+%28atari+ST%29/
+
+  - Cesar Astudillo (Gominolas) - Theme from Titanic CPC game
+    http://twitter.com/cesarastudillo
+
+  - Fenyx Kell - Solarium.mp3
+    http://8bitcollective.com/music/Sacrenouille/Solarium/
+
+
+ Some Recomendated Games:
+==========================
+
+
+SPORTS
+-----------
+Fernando Martin Basket Master
+Match Day 2
+Tenis 3D
+Colossus Chess
+Cyrus II Chess
+Summer Games
+Winter Games
+Emlyn Hughes
+Tie Break
+Perico Delgado
+
+
+
+ADVENTURES
+---------------
+La Abadia del Crimen (Best ever 8bits game Based on "Name of the Rose" - ONLY SPANISH)
+Head Over Heels
+Batman 3D (John Ritman)
+Rambo 3
+Dustin
+The Great Escape
+Knight Lore
+Pijamarama
+Myth: History Making
+3 weeks in paradise
+Last Ninja 2
+Livingstone Supongo
+Sir Fred
+Inside Outing 
+Fairlight
+Navy moves
+Shadow of the Beast
+
+
+ARCADE
+---------
+Gryzor (Aka Contra)
+Turrican II
+Renegade I y II
+Super Sprint
+Zona 0
+Year Die Kung Fu
+Kungfu Master
+Ikari Warrirors
+The Way of the Exploding Fist
+Commando
+Shinobi
+Strider 1 y 2
+Psycho Pig Uxb
+Oh! Mummy
+Gunfright
+Tempest
+Barbarian I
+Prohibition
+
+
+STRATEGY - PUZZLES
+-------------------
+Lords of Midnight
+North and South
+Elite
+Sentinel
+Archon 2
+Deflektor
+Puzznic
+Night Shift
+High Steel
+Spindizzy
+Boulder Dash
+Spherical
+Solomons Key
+
+
+PLATFORMS
+------------------
+Rick Dangerous
+Manic Miner
+Abu Simbel
+Vampire: Phantomas 2
+Prince of Persia
+Prehistorik II
+Antiriad
+Jet Set Willy 
+Rodland Series
+Bomb jack
+Bubble Bobble
+Rainbow Islands
+
+
+SHOOTERS
+--------------
+Defend or Die (Aka defender)
+Nemesis
+R-type
+Zynaps
+Psyborg
+1942
+Afterburner
+Thanatos
+Empire Strikes Back
+Army Moves
+virus
+Space Harrier 2
+Silk Worm
+Monty Phyton's Fliying Circus
+
+
+RPGs
+--------
+Bloodwych
+Bard's Tale
+Heroes of the Lance
+Hero Quest
+Space Crusader
+Rogue
+
+
+MISC.
+-------
+Teenage queen
+Sherman M4
+Fighter Bomber
+Total Eclipse
+Castle Master
+Dark Side
+
+
+
+ Where get downloads CPC games and more info:
+==============================================
+
+http://www.cantrell.org.uk/mirrors/ftp.nvg.ntnu.no/pub/cpc/games/ (European CPC Server)
+http://cpcgamereviews.com/a/index.html (CPC Reviews, Coments, Screens...)
+
+
+ TODO:
+=======
+1. 	DSK Save.
+2. 	CDT Support.
+3.      FTP Download Support.
+4.      ROM LIST Screenshots.
+
+See you
+	D_Skywalk
+
+http://david.dantoine.org
+
+Wiituka and Pituka are based on Caprice 4.1.0
+
+Oficial Web: http://wiituka.dantoine.org
+
+Beta-Testers: misato & xzakox.
+
+Menu-Artwork by D_Skywalk.
+
+Thanks to:  	Pelayo, JoJo, Dmusta1ne
+                Paco Menendez
+		to all the people that have send his donation to the proyect
+		to my mumm, girlfried and her poof bear: PituKa
+		& the pp of #mundo_viejuno on vieju.net :D
+
+Email: dantoine@gmail.com

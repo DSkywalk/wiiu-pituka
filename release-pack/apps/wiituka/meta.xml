@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+    <app version='1'>
+	<name>Wiituka</name>
+	<coder>D_Skywalk</coder>
+	<version>0.98.6</version>
+	<release_date>20091010124923</release_date>
+	<short_description>Amstrad CPC Emulator</short_description>
+	<long_description>WiituKa is an Amstrad CPC6128 emulator for the Wii system based on my last work Pituka for GamePark32.</long_description>
+    </app>

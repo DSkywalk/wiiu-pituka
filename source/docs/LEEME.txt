@@ -1,0 +1,71 @@
+************************************
+
+	PituKa V1.0d
+	SOURCE CODE
+
+************************************
+
+
+
+
+ Lo que me hubiera gustado tener en esta 1.0
+=============================================
+ He estado meses intentando cambiar el sonido para tener mejor soporte pero parece que no di 
+ con la forma adecuada, o se me escuchaba muy mal o directamente la emulacion se volvia lentisima...
+ de todas formas como habeis visto se va a liberar el codigo para que se aporten otros puntos
+ de vista ;)
+
+ No obstante no creo que podamos tener mejor sonido (y mas rapido) hasta que no ataquemos al Z80
+ asi que si os animais a toketear el PituKa empezad por ahi... En los foros de GP32spain.com se 
+ comento que podiamos preguntar a Reesy si podia el aplicarlo (me paso su CORE de Z80 pero no he 
+ sido capaz de aplicarlo ¿alguien se anima a comentarselo? ;)
+
+ Cosas rapidas y faciles de implementar que se han quedado en el tintero:
+	- Ordenar ROMS por nombre.
+	- Soporte para directorios.
+	- Key repeating en el vkeyboard.
+
+	
+ OPCIONES DE COMPILACION
+=========================
+ opts=-march=armv4t -mtune=arm9tdmi -marm -mno-thumb-interwork -ffast-math -fshort-enums -fno-common 
+ -ffreestanding -fno-builtin -fno-exceptions -mstructure-size-boundary=32 -fomit-frame-pointer -Wall -falign-functions 
+ -falign-jumps -falign-loops -falign-labels -finline-limit=500
+	
+Link: cap32.o crtc.o fdc.o tape.o psg.o z80.o rlyeh/sound/gpsoundbuf.o rlyeh/snaps/snapshot.o port/pituka.o port/GPio.o port/GPprintf.o port/files/explorer.o chatboard-mirko/gp_chatboard.o chatboard-mirko/gp_irq.o
+
+
+
+ TODO:
+=======
+0.	Usar el ASM/ARM9 z80 Core de Ressy (aumentara la velocidad)
+1. 	Mejor emulacion del PSG de CPC (Sonido digital)
+2. 	Grabacion en los dsk
+3. 	Soporte ZIP
+4. 	Soporte CDT
+
+
+Un Saludo
+	D_Skywalk
+
+http://gp32.dantoine.org	
+
+PituKa se baso en Caprice 4.1.0
+
+Introduccion: Vnomis & D_Skywalk
+
+Traduccion al ingles: Vnomis & D_Skywalk.
+
+Beta-Testers: WonderBoy & Antiriad.
+
+Menu-Artwork por Antiriad & D_Skywalk.
+
+Gracias a:  	Rlyeh, kotah, Franxis, Una-i 
+		Damizean, Pelayo, vnomis, Wonder_Boy
+		K-teto, Fagotero, Hexdump, A600
+		Azareus (Compadre), finty 
+		a todos los que han donado al proyecto
+		a mi madre, novia y su Osita de peluche: PituKa
+		a la gente de #gp32dev en efnet & Irc-Hispano :D
+
+Correo: dantoine@gmail.com

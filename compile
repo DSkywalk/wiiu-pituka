@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# This script is a HACK. See source/wpad_leds.c for more information.
+
+# Hide from recursive make
+[ "$MAKELEVEL" == "1" ] && unset MAKELEVEL
+
+TMPH=`mktemp`
+trap "rm -f $TMPH" EXIT
+
+BASE=wiituka #"`basename $PWD`"
+ELF="$BASE.elf"
+DOL="$BASE.dol"
+
+# If there are no symbols on the ELF file, delete it
+if [ -f "$ELF" ]
+then
+	file "$ELF" | grep -q "not stripped" || rm -f $ELF
+fi
+
+# As long as we don't have the right address for __wpads, keep recompiling
+while :
+do
+	COMPILE=compile make || exit $?
+	$DEVKITPPC/bin/powerpc-eabi-nm "$ELF" | grep __wpads$ | sed -e 's/^\([^ ]*\) .*$/#define __WPADS_ADDR 0x\1/' > $TMPH
+	cmp -s source/wii/wpad_leds/__wpads.h $TMPH && break
+	cp $TMPH source/wii/wpad_leds/__wpads.h
+        cat source/wii/wpad_leds/__wpads.h
+	# The timestamps probably won't have changed (enough) to get make to
+	# recompile; force it by deleting object files (maybe -W would work?)
+	rm -f build/wpad_leds.o $ELF $DOL
+done
+
+# Strip the ELF, and update the DOL to have the same timestamp
+#$DEVKITPPC/bin/powerpc-gekko-strip "$ELF"
+touch -r "$ELF" "$DOL"
