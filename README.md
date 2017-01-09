@@ -1,5 +1,5 @@
-# wiiu-pituka
-Wiituka-U - https://github.com/DSkywalk/wiiu-pituka/wiki
+# Wiituka-U
+https://github.com/DSkywalk/wiiu-pituka/wiki
 
 # Releases
 
