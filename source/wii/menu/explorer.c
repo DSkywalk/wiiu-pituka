@@ -385,7 +385,6 @@ bool Explorer_XMLNETread( void )
 bool Explorer_dirRead ( void )
 {
     int ngames = 0;
-	int n;
 
     DIR *pdir;
 	struct stat statbuf;
@@ -393,16 +392,14 @@ bool Explorer_dirRead ( void )
     t_fslist pnode;
 
 	if(!WiiStatus.Dev_Fat){
-	    for(n = 0; n < 100; n++)
-    	    printf ("NOT FAT!\n");
 		return false;
     }
 
 	pdir=opendir(current_path);
 
 	if (!pdir) {
-	    for(n = 0; n < 100; n++)
-    	    printf ("opendir() failure; terminating\n");
+   	    printf ("opendir() failure; terminating\n");
+   	    
 		return false;
 	}
 
@@ -551,12 +548,8 @@ void _nfoParse(t_infnode * ginfo, char * buffer, int bsize)
 
 bool Explorer_LoadFilelist(char * path)
 {
-   int error = 0;
-
-    if(strcmp(current_path, path) != 0 ) {
-	    strncpy(current_path, path, 1024); //size -1
-	    strcat(current_path, "/");
-    }
+    int error = 0;
+    snprintf(current_path, 1024, "%s%s%s", current_dev, path, "/");
 
     if(gamelist.fnext != NULL)
     	FileList_rClean(&gamelist);
@@ -580,10 +573,10 @@ bool Explorer_LoadFilelist(char * path)
     }
     */
 
-    if(WiiStatus.UpdateDIR){
+    if(WiiStatus.UpdateDIR) {
 	    if(!Explorer_dirRead()) {
   	        sprintf(debugt,"DEBUG: Exploracion erronea!" );
-    	        error++;
+    	    error++;
         }
 	    WiiStatus.UpdateDIR = 0;
     }
