@@ -25,7 +25,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-	
+    
 #include <gctypes.h>
 #include "../videowii.h"
 #include "../grrlib/GRRLIB.h"
@@ -75,13 +75,13 @@ void FileList_rClean (t_fslist * filenames)
 void FileList_Init (t_fslist * filenode){
 
         memset (&filenode->game, 0, sizeof(t_infnode));
-	filenode->gfile.filename[0] = 0;
+    filenode->gfile.filename[0] = 0;
         filenode->gfile.location = SU_NONE;
-	filenode->favorite = 0;
+    filenode->favorite = 0;
         //memset (filenode->binds, 0xff, MAX_CPCBUTTONS * 2);
         memcpy(filenode->binds, buttons_def, MAX_CPCBUTTONS * 2);
 
-	filenode->fnext = NULL;
+    filenode->fnext = NULL;
 
 }
 
@@ -108,42 +108,42 @@ void FileList_OrderbyName(t_fslist * filenames)
    t_fslist * current = filenames->fnext;
 
    int result = 0;
-   bool moved = false;	
+   bool moved = false;    
 
    while( 1 )
    {
 
      while ( current->fnext != NULL)
      {
-	result = strncmp(pre->game.title, current->game.title, 128);
+    result = strncmp(pre->game.title, current->game.title, 128);
 
-	if(result == 0)
+    if(result == 0)
         { //delete!
-		if(memcmp(&pre->gfile, &current->gfile, sizeof(t_WiiRom)) == 0)
-		{
-			pre->fnext = current->fnext;
-			free(current);
-			current = pre->fnext;
-		}
-		
-	} 
-	else if(result > 0)
-	{ //move!
-		_FileList_Swap(pre, current);
-		moved = true;
-	}
+        if(memcmp(&pre->gfile, &current->gfile, sizeof(t_WiiRom)) == 0)
+        {
+            pre->fnext = current->fnext;
+            free(current);
+            current = pre->fnext;
+        }
+        
+    } 
+    else if(result > 0)
+    { //move!
+        _FileList_Swap(pre, current);
+        moved = true;
+    }
 
-	current = current->fnext;
-	pre = pre->fnext;
+    current = current->fnext;
+    pre = pre->fnext;
 
      }
 
      if(moved == true){ //re-init
-	moved = false;
+    moved = false;
         pre = filenames;
         current = filenames->fnext;
      }else //no changes -> end!
-	break;
+    break;
   }
 
 }
@@ -157,25 +157,25 @@ void Explorer_rebuildRoms (const t_fslist * filenames)
 
    while(nnode->fnext != NULL){ //cuenta numero de roms
 
-	if(nnode->gfile.location == 0)
-	{
-		tmpnode = nnode->fnext;
+    if(nnode->gfile.location == 0)
+    {
+        tmpnode = nnode->fnext;
 
-		if(tmpnode->fnext == NULL){
-			FileList_Init(nnode);
-			free(tmpnode);
-			return;
-		}else{
-			memcpy(nnode, tmpnode, sizeof(t_fslist));
-			free(tmpnode);
-		}
-		
-	}
+        if(tmpnode->fnext == NULL){
+            FileList_Init(nnode);
+            free(tmpnode);
+            return;
+        }else{
+            memcpy(nnode, tmpnode, sizeof(t_fslist));
+            free(tmpnode);
+        }
+        
+    }
 
-	nnode = nnode->fnext;
+    nnode = nnode->fnext;
 
         //TODO: AÑADIR SOLO ROM+ SI location != 0 :)
-      	WiiStatus.nRoms++;
+          WiiStatus.nRoms++;
    }
 
 }
@@ -204,7 +204,7 @@ bool Explorer_XMLread (char * device, t_fslist * filenames)
 
 
     if(!XML_loadGameList((char *) file.buffer, nnode))
-   	    return false;
+           return false;
 
     return true;
 }
@@ -232,13 +232,13 @@ bool _FileList_UpdateFile(const char * filename, enum support_type nloc )
     while ( pnode->fnext != NULL)
     {
 
-    	if( (strncmp(filename, pnode->gfile.filename, 256) == 0) )
-	{
-		pnode->gfile.location = nloc;
-    		return true;
-	}
-	
-	pnode = pnode->fnext;
+        if( (strncmp(filename, pnode->gfile.filename, 256) == 0) )
+    {
+        pnode->gfile.location = nloc;
+            return true;
+    }
+    
+    pnode = pnode->fnext;
 
     }
 
@@ -255,31 +255,31 @@ bool _FileList_InsertGame (const t_fslist * nfile)
 
     while ( pnode->fnext != NULL)
     {
-    	if( (strncmp(nfile->gfile.filename, pnode->gfile.filename, 256) != 0) )
-    	{
-		result = strncmp(nfile->game.title, pnode->game.title, 128);
+        if( (strncmp(nfile->gfile.filename, pnode->gfile.filename, 256) != 0) )
+        {
+        result = strncmp(nfile->game.title, pnode->game.title, 128);
 
-		if(result == 0){
-		    	if ((nfile->gfile.location == SU_SD) 
-				&& ((pnode->gfile.location == SU_NONE) || (pnode->gfile.location == SU_HTTP) ))
-			{
-				memcpy(&pnode->gfile, &nfile->gfile, sizeof(t_WiiRom));
-				return true;
-			}
-			break;
-		}
-		
-		if(result < 0)
-			break;
+        if(result == 0){
+                if ((nfile->gfile.location == SU_SD) 
+                && ((pnode->gfile.location == SU_NONE) || (pnode->gfile.location == SU_HTTP) ))
+            {
+                memcpy(&pnode->gfile, &nfile->gfile, sizeof(t_WiiRom));
+                return true;
+            }
+            break;
+        }
+        
+        if(result < 0)
+            break;
 
-	}else if(nfile->gfile.location == SU_SD)
-	{
- 		if((pnode->gfile.location == SU_NONE) || (pnode->gfile.location == SU_HTTP) )
-			pnode->gfile.location = SU_SD;
-		return true;
-	}
+    }else if(nfile->gfile.location == SU_SD)
+    {
+         if((pnode->gfile.location == SU_NONE) || (pnode->gfile.location == SU_HTTP) )
+            pnode->gfile.location = SU_SD;
+        return true;
+    }
 
-	pnode = pnode->fnext;
+    pnode = pnode->fnext;
 
     }
 
@@ -288,11 +288,11 @@ bool _FileList_InsertGame (const t_fslist * nfile)
     //creamos
     newnode = malloc(sizeof(t_fslist));
     if(newnode == NULL)
-	return false;
+    return false;
 
     if( pnode->fnext != NULL)
-    {  	//copiamos los datos
-    	memcpy(newnode, pnode, sizeof(t_fslist));
+    {      //copiamos los datos
+        memcpy(newnode, pnode, sizeof(t_fslist));
     }else
         FileList_Init (newnode);
 
@@ -308,11 +308,11 @@ bool _FileList_InsertGame (const t_fslist * nfile)
 bool Explorer_XMLNETread( void )
 {
     t_fslist tmp_list = { 
-			{"", SU_NONE}, 
-			{ "", "", "", "", ""}, 0, 
-			{ 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-			  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff  },
-			NULL };
+            {"", SU_NONE}, 
+            { "", "", "", "", ""}, 0, 
+            { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+              0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff  },
+            NULL };
 
     t_fslist * nnode= &tmp_list;
 
@@ -343,22 +343,22 @@ bool Explorer_XMLNETread( void )
         sprintf(debugt, " XMLNET: Init state(%i), Last state(%i)", init_state, state);
         if(state == 6)
         {
-		    result = true;
+            result = true;
             fileSize = net_get_buffersize();
-           	if(fileSize > 0) {
-			    cad = (void *) malloc(fileSize + 1); 
-			    if(cad != NULL)
-				    strncpy(cad, (char*) net_get_charbuffer(), fileSize);
-			    else
-			        sprintf(debugt,"XMLNET: Downoad No MEM, Size(%i)", fileSize);
-		    } else
-  	             sprintf(debugt,"XMLNET: BAD DOWNLOAD? State(%i)", state);
-			
+               if(fileSize > 0) {
+                cad = (void *) malloc(fileSize + 1); 
+                if(cad != NULL)
+                    strncpy(cad, (char*) net_get_charbuffer(), fileSize);
+                else
+                    sprintf(debugt,"XMLNET: Downoad No MEM, Size(%i)", fileSize);
+            } else
+                   sprintf(debugt,"XMLNET: BAD DOWNLOAD? State(%i)", state);
+            
 
         } else if(state == 3) { //CANCEL
             net_stop_thread();
             return false;
-	    }
+        }
         GRRLIB_VSync (); //need it by thread
 
     }
@@ -371,9 +371,9 @@ bool Explorer_XMLNETread( void )
     while(nnode->fnext != NULL)
     {
         if(!_FileList_UpdateFile(nnode->gfile.filename, SU_HTTP))
-	    {
-		    if(_FileList_InsertGame(nnode))
-			    ngames++; //to use in debug mode
+        {
+            if(_FileList_InsertGame(nnode))
+                ngames++; //to use in debug mode
 
         }
         nnode = nnode->fnext;
@@ -387,28 +387,28 @@ bool Explorer_dirRead ( void )
     int ngames = 0;
 
     DIR *pdir;
-	struct stat statbuf;
-	struct dirent *pent;
+    struct stat statbuf;
+    struct dirent *pent;
     t_fslist pnode;
 
-	if(!WiiStatus.Dev_Fat){
-		return false;
+    if(!WiiStatus.Dev_Fat){
+        return false;
     }
 
-	pdir=opendir(current_path);
+    pdir=opendir(current_path);
 
-	if (!pdir) {
-   	    printf ("opendir() failure; terminating\n");
-   	    
-		return false;
-	}
+    if (!pdir) {
+           printf ("opendir() failure; terminating\n");
+           
+        return false;
+    }
 
     //while(dirnext(pdir,filename,&statbuf) == 0) {
     while ((pent = readdir(pdir)) != NULL) {
         stat(pent->d_name,&statbuf);
         
         if(S_ISDIR(statbuf.st_mode))
-       	    continue;
+               continue;
 
         if(strlen(current_path) + strlen(pent->d_name) >= 1024)
             continue; //path demasiado largo, saltamos
@@ -416,24 +416,24 @@ bool Explorer_dirRead ( void )
         lowercase (pent->d_name, false);
 
         if ( memcmp((char*) &pent->d_name[(strlen(pent->d_name)-4)], ".zip", 4) != 0) 
-		    continue;
+            continue;
 
-	    if(!_FileList_UpdateFile(pent->d_name, SU_SD)) {
-		    FileList_Init(&pnode); //cleaning node
+        if(!_FileList_UpdateFile(pent->d_name, SU_SD)) {
+            FileList_Init(&pnode); //cleaning node
 
-		    _nfoRead(&pnode.game, pent->d_name);
-		    strcpy(pnode.gfile.filename, pent->d_name);
-		    pnode.gfile.location = SU_SD;
+            _nfoRead(&pnode.game, pent->d_name);
+            strcpy(pnode.gfile.filename, pent->d_name);
+            pnode.gfile.location = SU_SD;
 
-		    if(_FileList_InsertGame(&pnode)) // TODO: HACER FLUSH PARA EVITAR CUELGUES? 
-			    ngames++; //to use in debug mode
+            if(_FileList_InsertGame(&pnode)) // TODO: HACER FLUSH PARA EVITAR CUELGUES? 
+                ngames++; //to use in debug mode
 
         }
-	}
+    }
 
     closedir(pdir);
 
-	return true;
+    return true;
 
 }
 
@@ -460,7 +460,7 @@ void _nfoRead(t_infnode * ginfo, char * filename) //añadir modo online
 
    if ((iErrorCode = zipBuffered_dir(file.buffer, file.size, &zinfo))){
        if(iErrorCode != 15)
-       	  sprintf(debugt,"Zdir: Err: %i (%s-%i)" ,iErrorCode, filename, file.size);
+             sprintf(debugt,"Zdir: Err: %i (%s-%i)" ,iErrorCode, filename, file.size);
 
        free(file.buffer);
        return;
@@ -473,7 +473,7 @@ void _nfoRead(t_infnode * ginfo, char * filename) //añadir modo online
 
        if(ebuffer == NULL){
            free(file.buffer);
-	   return;
+       return;
        }
 
        if (!(iErrorCode = zipBuffered_extract( ebuffer, file.buffer, zinfo.dwOffset))) {
@@ -552,33 +552,33 @@ bool Explorer_LoadFilelist(char * path)
     snprintf(current_path, 1024, "%s%s%s", current_dev, path, "/");
 
     if(gamelist.fnext != NULL)
-    	FileList_rClean(&gamelist);
+        FileList_rClean(&gamelist);
 
     if(!Explorer_XMLread("sd:", &gamelist)) //lee la cache XML
         error++;
     
     /*
     if(WiiStatus.UpdateXMLNET) {
-    	if(!Explorer_XMLNETread()) {
-		    sprintf(debugt,"DEBUG: Exploracion Online erronea!" );
-	        error++;
-	    }else{
-	        WiiStatus.UpdateDIR = 1;
-	        WiiStatus.SaveXML = 1;
-	        WiitukaXML.xmlgameversion = WiiStatus.VersionXMLNET;
-	    }
+        if(!Explorer_XMLNETread()) {
+            sprintf(debugt,"DEBUG: Exploracion Online erronea!" );
+            error++;
+        }else{
+            WiiStatus.UpdateDIR = 1;
+            WiiStatus.SaveXML = 1;
+            WiitukaXML.xmlgameversion = WiiStatus.VersionXMLNET;
+        }
 
-	    WiiStatus.UpdateXMLNET = 0;
+        WiiStatus.UpdateXMLNET = 0;
 
     }
     */
 
     if(WiiStatus.UpdateDIR) {
-	    if(!Explorer_dirRead()) {
-  	        sprintf(debugt,"DEBUG: Exploracion erronea!" );
-    	    error++;
+        if(!Explorer_dirRead()) {
+              sprintf(debugt,"DEBUG: Exploracion erronea!" );
+            error++;
         }
-	    WiiStatus.UpdateDIR = 0;
+        WiiStatus.UpdateDIR = 0;
     }
 
     Explorer_rebuildRoms((const t_fslist *) &gamelist);
