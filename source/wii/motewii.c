@@ -66,7 +66,7 @@ extern char spool_cad[256];
 
 /* CONTROL GLOBALS */
 unsigned char kbind = 0xff;
-bool __gunstick_checkHit (void);
+inline bool __gunstick_checkHit (void);
 inline void _wiimoteBind (t_mote * wiipad);
 
 u8 current_buttons = WIIMOTE_ONLY_BUTTONS;
@@ -550,7 +550,7 @@ void poll_wiimote(void)
             }
             else
             {
-                if (controls.wpad1.bHeld & ( WPAD_BUTTON_A | WPAD_BUTTON_B)){
+                if (controls.wpad1.bHeld & (  WPAD_BUTTON_B)){ // WPAD_BUTTON_A
                     controls.wpad1.bHeld |= WPAD_BUTTON_1;
                     gunstick.state = WII_GUNSTICK_SHOOT; //prepare detect...
                 }
@@ -657,13 +657,14 @@ void WiimoteLoadKeys (void)
 */
 void WiimoteSetupGun( int Init)
 {
-    if(Init)
+    if(Init){
         Element_SelectImg( &cursor, 3 ); //cursor de pistola
-    else
+    } else {
         Element_SelectImg( &cursor, 1 ); //hand open
+    }
 
     if(!WiitukaXML.scrtube)
-        gunstick.hcolor = WII_GUNSTICK_HITCOLOR;
+        gunstick.hcolor = WII_GUNSTICK_MINCOLOR; //WII_GUNSTICK_HITCOLOR;
     else
         gunstick.hcolor = WII_GUNSTICK_HITGREEN;
 
@@ -677,14 +678,17 @@ void WiimoteSetupGun( int Init)
 */
 unsigned char Wiimote_CheckGun (void)
 {
-    if(gunstick.state == WII_GUNSTICK_SHOOT){
+    if(gunstick.state == WII_GUNSTICK_SLEEP)
+        return 0xff; //nada
+    
+    if(gunstick.state == WII_GUNSTICK_SHOOT) {
         gunstick.timer = GetTicks(); //cogemos el timer
         gunstick.state = WII_GUNSTICK_XYGET;
     }
     else if((GetTicks()-gunstick.timer) > WII_GUNSTICK_TIMER) //si han pasado...
         gunstick.state = WII_GUNSTICK_SLEEP;
     else if(__gunstick_checkHit())
-        return 0xfc; //joy abajo + arriba phaser - test
+        return 0xfe; //joy arriba phaser fe
 
     return 0xff; //nada
 }
@@ -694,10 +698,10 @@ unsigned char Wiimote_CheckGun (void)
  
     \return true, si hubo acierto.
 */
-bool __gunstick_checkHit (void)
+inline bool __gunstick_checkHit (void)
 {
-    u32 gcolor = 0;
-
+    unsigned int gcolor;
+    
     if(gunstick.state == WII_GUNSTICK_XYGET)
     {
         gunstick.x = cursor.Left + GUNSTICK_CURSOR_FIXED_X;
@@ -707,8 +711,11 @@ bool __gunstick_checkHit (void)
 
     gcolor = GetXYScreen (gunstick.x, gunstick.y);
 
-    if(gcolor == gunstick.hcolor ) // blanco? - todo!
+    if(gcolor > gunstick.hcolor ){ // blanco? - todo!
+        spool = 1;
+        sprintf(spool_cad, "get: %x", gcolor);
         return true;
+    }
 
     return false;
 }

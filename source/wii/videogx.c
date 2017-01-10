@@ -333,21 +333,28 @@ void FillScreen ( int Updated )
     \return el color del pixel o 0 si el rango dado es erroneo.
 
 */
-u32 GetXYScreen (f32 x, f32 y)
+unsigned int GetXYScreen (f32 x, f32 y)
 {
 
   int tx = x / cpc_zoom; //a 384
   int ty = y / cpc_zoom; //a 272
 
-  if(! ((tx > 0) && (ty > 0) && (tx <= WRES) && (ty <= HRES)) )
+  if(! ((tx > 0) && (ty > 0) && (tx <= (WRES-4)) && (ty <= (HRES-4))) )
    return 0;
 
-  u16 * src = (u16 *) pix ;
+  u16 * src = (u16 *) pix;
 
   src += (ty * WRES);
   src += tx;
+  
+  u16 final = *src++;
+  if(final < *src)
+      final = *src;
+  src += WRES; 
+  if(final < *src)
+      final = *src;
 
-  return *src; 
+  return final; 
 }
 
 
@@ -374,7 +381,7 @@ void UpdateScreen (void)
 {
 
    GRRLIB_Render();
-  // GRRLIB_VSync (); //enlentece demasiado la gui durante la emulacion, por el momento off.
+   GRRLIB_VSync (); //enlentece demasiado la gui durante la emulacion, por el momento off.
 
 }
 

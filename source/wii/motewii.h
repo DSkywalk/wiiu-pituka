@@ -68,6 +68,9 @@ void WiimoteLoadKeys(void);
 #define WII_GUNSTICK_HITCOLOR 0xc658
 #define WII_GUNSTICK_HITGREEN 0x4a0
 
+#define WII_GUNSTICK_MINCOLOR 0xc300 // try with min color
+
+
 #define WPAD_EXTRA_JOY_UP				0x2000
 #define WPAD_EXTRA_JOY_DOWN				0x4000
 #define WPAD_EXTRA_JOY_LEFT				0x0020

@@ -43,7 +43,7 @@ void CleanScreen (void);
 void UpdateScreen (void);
  
 void FillScreen ( int Updated );
-u32 GetXYScreen (f32 x, f32 y);
+unsigned int GetXYScreen (f32 x, f32 y);
 
 /*
   VIDEO UTILS

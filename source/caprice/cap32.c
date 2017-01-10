@@ -527,13 +527,16 @@ byte z80_IN_handler (reg_pair port)
                   if (PSG.reg_select < 16) { // within valid range?
                      if (PSG.reg_select == 14) { // PSG port A?
                         if (!(PSG.RegisterAY.Index[7] & 0x40)) { // port A in input mode?
-                           ret_val = keyboard_matrix[CPC.keyboard_line & 0x0f]; // read keyboard matrix node status
+                           val = CPC.keyboard_line & 0x0f;
+                           ret_val = keyboard_matrix[val]; // read keyboard matrix node status
+   			               if(WiiStatus.Gunstick && val == 9) //read line 9 GunStick & state != sleep
+			       		      ret_val &= Wiimote_CheckGun(); //checking and return gun value
                         } else {
                            ret_val = PSG.RegisterAY.Index[14] & (keyboard_matrix[CPC.keyboard_line & 0x0f]); // return last value w/ logic AND of input
                         }
-			if(((CPC.keyboard_line & 0x0f) == 9) && gunstick.state) { //read line 9 GunStick & state != sleep
-			       		ret_val &= Wiimote_CheckGun(); //checking and return gun value
-			}
+			            //if(((CPC.keyboard_line & 0x0f) == 9) && gunstick.state) //read line 9 GunStick & state != sleep
+			            //  ret_val &= Wiimote_CheckGun();
+
                      } else if (PSG.reg_select == 15) { // PSG port B?
                         if ((PSG.RegisterAY.Index[7] & 0x80)) { // port B in output mode?
                            ret_val = PSG.RegisterAY.Index[15]; // return stored value
