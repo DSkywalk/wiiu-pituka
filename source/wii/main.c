@@ -57,6 +57,7 @@ void close_buffer (void);
 /* * GLOBALES * */
 xmlWiiCFG WiitukaXML;
 extern t_fslist gamelist;
+extern char current_dev[8 + 1];
 
 char extension[5];
 char file_state[13];
@@ -93,8 +94,8 @@ extern byte *pbGPBuffer;
 
 /* MAIN FUNCTIONS */
 void Wiituka_InitCFG(void);
-void Wiituka_LoadCFG(char * path);
-void Wiituka_SaveCFG(char * path);
+void Wiituka_LoadCFG(char * device);
+void Wiituka_SaveCFG(char * device);
 void Wiituka_LoadNetUpdate(void);
 
 int wii_input (void){
@@ -128,24 +129,27 @@ bool BuffersInit(void)
 
 void DevicesInit(void)
 {
-    printf(" ."); 
-
-    if(!fatInitDefault ()) //no usar aqui mountDev, por que la primera vez debe ser iniciado asi.
+    bool mounted = false;
+    //printf(" ."); 
+    
+    //check if USB is available
+    if(Explorer_isUSB()) {
+        mounted = true;
+        strcpy(current_dev, "usb:");
+    } else if(Explorer_isSDCARD()) {
+        mounted = true;
+        strcpy(current_dev, "sd:");
+    }
+    
+    if(!mounted)
     {
         //printf("\n MAIN: Unable to initialise FAT subsystem.  Are there any connected devices?\n  I'll continue without fat support..."); 
         WiiStatus.Dev_Fat = 0;
         net_init_thread();
-    }else if(!CreateDirs ("fat3:"))
-    {
-        printf("\n MAIN: Unable to initialise DIRS.  Please use another SD Card\n  I'll continue without fat support..."); 
-        WiiStatus.Dev_Fat = 0;
-        net_init_thread();
-    }
-    else
-    {
+    } else {
         WiiStatus.Dev_Fat = 1;
-        Wiituka_LoadCFG("fat3:");
-        printf("."); 
+        Wiituka_LoadCFG(current_dev);
+        //printf("."); 
 
         //INIT DHCP WII LAN
         if(!WiitukaXML.disablenet)
@@ -155,7 +159,7 @@ void DevicesInit(void)
     }
 
     srand(GetTicks());
-    printf(" .\n"); 
+    //printf(" .\n"); 
 
 }
 
@@ -168,7 +172,7 @@ void doPowerOff()
     free(pbGPBuffer);
 
     VideoClose();
-    fatUnmount("sd:/");
+    Explorer_Unmount();
     WPAD_Shutdown();
 
     if (!!*(u32*)0x80001800)
@@ -220,12 +224,12 @@ int main(int argc, char *argv[]) {
     //save rom cache/prefs...
     if(WiiStatus.Dev_Fat)
     {
-        if(!Explorer_XMLsave ("fat3:", &gamelist))
+        if(!Explorer_XMLsave (current_dev, &gamelist))
             printf(" DEBUG: Error al Guardar CACHE_ROMS!\n" );
 
         //save config...
         if(WiiStatus.SaveXML)
-            Wiituka_SaveCFG("fat3:");
+            Wiituka_SaveCFG(current_dev);
     }
 
     MenuClose();
@@ -285,7 +289,7 @@ int load_rom(t_WiiRom * romfs)
     switch (romfs->location)
     {
         case SU_SD:
-            strcpy(path, "fat3:"); 
+            strcpy(path, current_dev); 
 
             strcat(path, CPC_ROMSDIR);
             strcat(path, "/");
@@ -441,11 +445,11 @@ void Wiituka_InitCFG(void)
 
 }
 
-void Wiituka_LoadCFG(char * path)
+void Wiituka_LoadCFG(char * device)
 {
     char temp[1024];
 
-    sprintf(temp,"%s%s/wiituka_conf.xml", path, CPC_ROOTDIR);
+    sprintf(temp,"%s%s/wiituka_conf.xml", device, CPC_FILEDIR);
 
     if(!XML_loadPublic(temp)){
         WiiStatus.SaveXML = 1;
@@ -453,12 +457,12 @@ void Wiituka_LoadCFG(char * path)
 
 
 }
-void Wiituka_SaveCFG(char * path)
+void Wiituka_SaveCFG(char * device)
 {
 
     char temp[1024];
 
-    sprintf(temp,"%s%s/wiituka_conf.xml", path, CPC_ROOTDIR);
+    sprintf(temp,"%s%s/wiituka_conf.xml", device, CPC_FILEDIR);
    
     //printf(" Saving Config XML...\n");
     if(!XML_savePublic(temp))

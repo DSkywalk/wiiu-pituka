@@ -14,6 +14,7 @@
 #define explorer_h
 
 #define FSNAMEMAX 255 + 1
+#define FSDIRMAX 512
 
 typedef struct {
 	char title   [128];
@@ -40,6 +41,10 @@ void FileList_OrderbyName(t_fslist * filenames);
 bool Explorer_LoadFilelist(char * path); //tambien cambia current_path (directorio donde leer R00MS!)
 
 bool Explorer_XMLsave (char * path, t_fslist * filenames);
+
+void Explorer_Unmount (void);
+bool Explorer_isUSB (void);
+bool Explorer_isSDCARD (void);
 
 #endif
 

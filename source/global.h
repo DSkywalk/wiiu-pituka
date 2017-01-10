@@ -266,11 +266,12 @@ int loadBuffered_rom (void * rbuffer, int bSize);
 
 #define CONST_ZOOM_RATIO 0.833 //1.667
 
-#define CPC_ROOTDIR "/APPS/WIITUKA"
-#define CPC_ROMSDIR CPC_ROOTDIR "/DISKS"
-#define CPC_SAVEDIR CPC_ROOTDIR "/SAVES"
-#define CPC_SCFGDIR CPC_SAVEDIR "/CFG"
-#define CPC_SCRNDIR CPC_ROOTDIR "/SCREENS"
+//#define CPC_ROOTDIR "/APPS/WIITUKA"
+#define CPC_FILEDIR "/WIITUKA"
+#define CPC_ROMSDIR CPC_FILEDIR "/DISKS"
+#define CPC_SAVEDIR CPC_FILEDIR "/SAVES"
+#define CPC_SCFGDIR CPC_FILEDIR "/CFG"
+#define CPC_SCRNDIR CPC_FILEDIR "/SCREENS"
 
 #define WIIDEFAULT_URL "http://wiituka.dantoine.org"
 

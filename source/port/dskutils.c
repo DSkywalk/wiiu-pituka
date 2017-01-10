@@ -13,17 +13,10 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifdef GEKKO
-#include <sdcard/wiisd_io.h>
-#include <sdcard/gcsd.h>
-#include <ogc/usbstorage.h>
-#include <fat.h>
-#endif
-
 #include <dirent.h>
 #include "sys/dir.h"
 
-#ifndef GEKKO
+#ifdef GEKKO
   typedef unsigned int bool;
 #endif
 
@@ -41,12 +34,8 @@ extern unsigned char spool;
 extern unsigned char reiniciado;
 
 
-extern char current_path [1024];
-
-#ifdef GEKKO
-const DISC_INTERFACE* sd = &__io_wiisd;
-const DISC_INTERFACE* usb = &__io_usbstorage;
-#endif
+extern char current_path [1024 + 1];
+//extern char current_dev  [8 + 1];
 
 bool Explorer_dskBufferedRead ( void * dskBuffer)
 {
@@ -359,7 +348,7 @@ bool Explorer_dskRead ( char * dskname )
   FILE UTILS
 */
 
-bool Explorer_fileRead ( t_filebuf * file, char * path )
+bool fileRead ( t_filebuf * file, char * path )
 {
     FILE * pfile;
 
@@ -404,102 +393,21 @@ bool Explorer_fileRead ( t_filebuf * file, char * path )
 }
 
 
-
-
-bool CreateDirs (char *path)
-{
-    char temp[512];
-    bool any_created = false;
-
-    sprintf(temp, "%s%s", path, "/");
-    DIR* pdir = opendir(temp);
-
-    if (pdir == NULL)
-    {
-        printf("CreateDirs: Cannot Open: %s\n", temp);
-        return false;    
-    }
-
-    closedir(pdir);
-
-    //create CPCROOT?
-    sprintf(temp, "%s%s", path, CPC_ROOTDIR);
-    if (chdir(temp)){ //NOT FOUND?
-        printf("CreateDirs: mkdir: %s\n", temp);
-        if (mkdir(temp, S_IREAD | S_IWRITE) == -1) //CREATE IT!
-            return false;
-        else
-            any_created = true;
-    }
-
-    if (!chdir(temp)) //NOW IS OK?
-    {
-        //create CPCR00MS!?
-        sprintf(temp, "%s%s", path, CPC_ROMSDIR);
-        if (chdir(temp))
-        {
-            printf("CreateDirs: mkdir: %s\n", temp);
-            mkdir(temp, S_IREAD | S_IWRITE);
-            any_created = true;
-        }
-
-        sprintf(temp, "%s%s", path, CPC_SAVEDIR);
-
-        if (chdir(temp))
-        {
-            printf("CreateDirs: mkdir: %s\n", temp);
-            mkdir(temp, S_IREAD | S_IWRITE);
-            any_created = true;
-        }
-
-        //no need it ATM...
-        #if 0 
-        sprintf(temp, "%s%s", path, CPC_SCFGDIR);
-        if (chdir(temp)){
-                    printf("CreateDirs: mkdir: %s\n", temp);
-            mkdir(temp, S_IREAD | S_IWRITE);
-            any_created = true;
-        }
-        
-        
-        sprintf(temp, "%s%s", path, CPC_SCRNDIR);
-        if (chdir(temp)){
-                        printf("CreateDirs: mkdir: %s\n", temp);
-            mkdir(temp, S_IREAD | S_IWRITE);
-            any_created = true;
-        }
-        #endif
-            
-    }else
-        return false; //NOT CREATED?
-
-#ifdef GEKKO
-
-    if(any_created){
-        if(!mountDev(SU_SD, true))
-            return false;
-    }
-#endif    
-    
-    return true;
-}
-
 int snapshot_save (char *pchFileName);
 int snapshot_load (char *pchFileName);
 extern unsigned char spool;
 extern char spool_cad[256];
 
-bool doSnapshot (char * path, char * romname, int action)
-{
+bool doSnapshot (char * device, char * romname, int action) {
     char pathSnap[1024] = "";
     char tmp[256]= "";
     int result= -1;
 
-    if(strlen(romname) < 5){
-    spool = 1;
-    sprintf(spool_cad, " SNAPSHOT-Err: I NEED A ROM LOADED...");
+    if(strlen(romname) < 5) {
+        spool = 1;
+        sprintf(spool_cad, " SNAPSHOT-Err: I NEED A ROM LOADED...");
 
-    return false;
+        return false;
     }
 
     StopSound(1);
@@ -508,7 +416,7 @@ bool doSnapshot (char * path, char * romname, int action)
     tmp[strlen(romname)-4] = '\0'; // zero terminate string
     strcat(tmp, ".sna");
 
-    strncpy(pathSnap, path, 1024);
+    strncpy(pathSnap, device, 1024);
     strcat(pathSnap, CPC_SAVEDIR);
     strcat(pathSnap, "/");
     strcat(pathSnap, tmp);
@@ -549,66 +457,6 @@ bool doSnapshot (char * path, char * romname, int action)
     return true;
 
 }
-
-
-void doPowerOff();
-
-bool mountDev ( enum support_type dev, bool remount)
-{
-#ifdef GEKKO
-    char fsys[10]="";
-    char device[10]="";
-
-    const DISC_INTERFACE* disc = NULL;
-
-    switch(dev)
-    {
-        case SU_USB:
-            sprintf(device, "usb");
-            disc = usb;
-            break;
-        case SU_SD:
-            sprintf(device, "sd");
-            disc = sd;
-            break;
-
-        case SU_DVD:
-        default:
-            return false;
-    }
-
-    sprintf(fsys, "%s:/", device);
-
-    if(remount)
-    {
-        fatUnmount(fsys);
-        disc->shutdown();
-        printf(" Remount (%s): ", device);
-    }else
-        printf(" Mount (%s): ", device);
-
-    if(!disc->startup())
-    {
-        printf(" startup - %s (FAIL!)\n", device);
-        return false;
-    }
-    
-    if(!fatMountSimple(device, disc))
-    {
-        printf(" mount - %s (FAIL!)\n", device);
-        return false;
-    }else
-           printf("OK!\n");
-
-    printf(" Dirs OK!\n  Please, Reload Wiituka..."); 
-    usleep(50000);
-
-    doPowerOff();
-
-#endif
-    return true;
-}
-
 
 void updateDol (enum support_type dev)
 {

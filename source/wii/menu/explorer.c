@@ -17,6 +17,8 @@
 #include <string.h>
 #include <dirent.h>
 #include <ctype.h>
+#include <fat.h>
+#include <sdcard/wiisd_io.h>
 
 #include <sys/iosupport.h>
 #include <sys/dir.h>
@@ -48,6 +50,7 @@ extern t_fslist gamelist;
 extern const unsigned char buttons_def[MAX_CPCBUTTONS * 2];
 
 char current_path [1024 + 1] = "";
+char current_dev  [8 + 1] = "";
 
 void _nfoRead(t_infnode * ginfo, char * filename);
 void _nfoParse(t_infnode * ginfo, char * buffer, int bsize);
@@ -178,41 +181,41 @@ void Explorer_rebuildRoms (const t_fslist * filenames)
 }
 
 
-bool Explorer_XMLread (char * path, t_fslist * filenames)
+bool Explorer_XMLread (char * device, t_fslist * filenames)
 {
-   t_fslist * nnode= filenames;
+    t_fslist * nnode= filenames;
 
-   char temp[1024]= "";
-   t_filebuf file;
+    char temp[1024]= "";
+    t_filebuf file;
 
-   if(!WiiStatus.Dev_Fat)
-	return false;
+    if(!WiiStatus.Dev_Fat)
+        return false;
 
-   strcpy(temp, path); 
-   strcat(temp, CPC_ROOTDIR);
-   strcat(temp, "/wiituka_romcache.xml");
+    strcpy(temp, device); 
+    strcat(temp, CPC_FILEDIR);
+    strcat(temp, "/wiituka_romcache.xml");
 
-   if(!Explorer_fileRead (&file, temp )){ //carga el XML en memoria
-     return false;
-   }
+    if(!fileRead (&file, temp )){ //carga el XML en memoria
+        return false;
+    }
 
-   if(nnode->fnext != NULL) //comprueba que la lista esta vacia :-
-      FileList_rClean(filenames);
+    if(nnode->fnext != NULL) //comprueba que la lista esta vacia :-
+        FileList_rClean(filenames);
 
 
-   if(!XML_loadGameList((char *) file.buffer, nnode))
-   	return false;
+    if(!XML_loadGameList((char *) file.buffer, nnode))
+   	    return false;
 
-   return true;
+    return true;
 }
 
 
-bool Explorer_XMLsave (char * path, t_fslist * filenames)
+bool Explorer_XMLsave (char * device, t_fslist * filenames)
 {
     char temp[1024]= "";
 
-    strcpy(temp, path); 
-    strcat(temp, CPC_ROOTDIR);
+    strcpy(temp, device);
+    strcat(temp, CPC_FILEDIR);
     strcat(temp, "/wiituka_romcache.xml");
 
     if(!XML_saveGameList(temp, filenames))
@@ -382,7 +385,7 @@ bool Explorer_XMLNETread( void )
 bool Explorer_dirRead ( void )
 {
     int ngames = 0;
-	    int n;
+	int n;
 
     DIR *pdir;
 	struct stat statbuf;
@@ -449,7 +452,7 @@ void _nfoRead(t_infnode * ginfo, char * filename) //añadir modo online
    strcpy(path, current_path); 
    strcat(path, filename);
 
-   if(!Explorer_fileRead (&file, path ))
+   if(!fileRead (&file, path ))
      return;
 
    zinfo.pchFileNames = NULL;
@@ -558,7 +561,7 @@ bool Explorer_LoadFilelist(char * path)
     if(gamelist.fnext != NULL)
     	FileList_rClean(&gamelist);
 
-    if(!Explorer_XMLread("fat3:", &gamelist)) //lee la cache XML
+    if(!Explorer_XMLread("sd:", &gamelist)) //lee la cache XML
         error++;
     
     /*
@@ -594,6 +597,115 @@ bool Explorer_LoadFilelist(char * path)
 
 }
 
+/********** FILESYSTEM ************/
+
+void Explorer_Unmount(void) {
+    fatUnmount(current_dev);
+    WiiStatus.Dev_Fat = 0;
+}
+
+const DISC_INTERFACE* sd = &__io_wiisd;
+bool _createDirs (char *device);
+bool Explorer_isSDCARD (void) {
+    DIR *pdir;
+    if( (!sd->startup()) || (!fatMountSimple("sd", sd)) )
+        return false;
+    
+    pdir=opendir("sd:" CPC_FILEDIR);
+
+    if (!pdir) {
+        if(!_createDirs("sd:")) {
+            fatUnmount("sd:");
+            printf(" ERROR NO Dirs Created! - Wiituka NETMODE\n  Please, reload Wiituka and check your sd...\n");
+            usleep(50000);
+            return false;
+        }
+        
+        pdir=opendir("sd:" CPC_FILEDIR);
+        if (!pdir) {
+            fatUnmount("sd:");
+            return false;
+        }
+    }
+
+    return true;
+}
+
+const DISC_INTERFACE* usb = &__io_usbstorage;
+bool Explorer_isUSB(void) {
+    DIR *pdir;
+    if( (!usb->startup()) || (!fatMountSimple("usb", usb)) )
+        return false;
+    
+    pdir=opendir("usb:" CPC_FILEDIR);
+
+    if (!pdir) {
+        fatUnmount("usb:");
+        return false;
+    } else {
+        // just try to create if /WIITUKA/ path exists
+        if(!_createDirs("usb:")) {
+            fatUnmount("usb:");
+            return false;
+        }
+    }
+
+    return true;
+}
 
 
+bool _createDirs (char *device) {
+    char temp[FSDIRMAX + 1];
+    bool any_created = false;
+
+    snprintf(temp, FSDIRMAX, "%s%s", device, "/");
+    DIR* pdir = opendir(temp);
+
+    if (pdir == NULL) {
+        printf("CreateDirs: Cannot Open: %s\n", temp);
+        return false;
+    }
+
+    closedir(pdir);
+
+    //create CPC_FILEDIR?
+    snprintf(temp, FSDIRMAX, "%s%s", device, CPC_FILEDIR);
+    if (chdir(temp)){ //NOT FOUND?
+        printf("CreateDirs: mkdir: %s\n", temp);
+        if (mkdir(temp, S_IREAD | S_IWRITE) == -1) //CREATE IT!
+            return false;
+        else
+            any_created = true;
+    }
+
+    //cd CPC_FILEDIR?
+    if (!chdir(temp)) {
+    
+        //create CPCR00MS!?
+        snprintf(temp, FSDIRMAX, "%s%s", device, CPC_ROMSDIR);
+        if (chdir(temp))
+        {
+            printf("CreateDirs: mkdir: %s\n", temp);
+            mkdir(temp, S_IREAD | S_IWRITE);
+            any_created = true;
+        }
+
+        snprintf(temp, FSDIRMAX, "%s%s", device, CPC_SAVEDIR);
+
+        if (chdir(temp))
+        {
+            printf("CreateDirs: mkdir: %s\n", temp);
+            mkdir(temp, S_IREAD | S_IWRITE);
+            any_created = true;
+        }
+    } else
+        return false; //NOT CREATED?
+
+    if(any_created){    
+        printf(" Dirs Created OK!\n  Please, reload Wiituka and add some roms on %s...\n", device);
+        usleep(50000);
+    }
+    
+    return true;
+}
 

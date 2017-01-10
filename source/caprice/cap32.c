@@ -3136,8 +3136,8 @@ int loadBuffered_rom (void * rbuffer, int bSize){
    return 1;
 }
 
-
-bool loadFiled_rom (char *file_name){
+/* disable! */
+bool _loadFiled_rom (char *file_name){
    int iErrorCode = 0;
 
 

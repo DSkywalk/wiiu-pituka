@@ -44,6 +44,7 @@ extern int menuLoaded;
 extern t_WiiRom globalRom;
 extern WiituKa_Status WiiStatus;
 extern xmlWiiCFG WiitukaXML;
+extern char current_dev[8 + 1];
 
 
 t_element cursor;
@@ -924,14 +925,14 @@ void ShowEmuCommon ( void)
 
                     if(snap_state == STATE_SNAP_SAVE)
                     {
-                        doSnapshot ("fat3:", globalRom.filename, SNAP_SAVE);
+                        doSnapshot (current_dev, globalRom.filename, SNAP_SAVE);
                         p_buttons = 0; 
                         mstate = -1;
                     }
 
                     if(snap_state == STATE_SNAP_LOAD)
                     {
-                        doSnapshot ("fat3:", globalRom.filename, SNAP_LOAD);
+                        doSnapshot (current_dev, globalRom.filename, SNAP_LOAD);
                         p_buttons = 0; 
                         mstate = -1;
                     }
