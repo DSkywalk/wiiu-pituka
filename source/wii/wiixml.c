@@ -394,7 +394,7 @@ bool XML_loadGameList(char * xmldata, t_fslist * gamelist)
         else 
             continue; //next game
         tmp = mxmlElementGetAttr(data,"location"); 
-        if (tmp! = NULL) {
+        if (tmp!=NULL) {
             nnode->gfile.location = atoi(tmp);
             if(nnode->gfile.location == SU_SD) //fichero de cache a ser comprobado
                 nnode->gfile.location = SU_NONE;
