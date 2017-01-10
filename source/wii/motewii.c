@@ -503,7 +503,7 @@ void poll_wiimote(void)
                 if(WiiStatus.Gunstick)
                 {
                     spool = 1;
-                    sprintf(spool_cad, " GUSTICK MODE: FINISHED...");
+                    sprintf(spool_cad, " GUNSTICK MODE: FINISHED...");
                     WiimoteSetupGun(0);
                     WiiStatus.Gunstick = 0;
                 }
@@ -551,7 +551,7 @@ void poll_wiimote(void)
             else
             {
                 if (controls.wpad1.bHeld & ( WPAD_BUTTON_A | WPAD_BUTTON_B)){
-                    controls.wpad1.bHeld |= WPAD_BUTTON_2;
+                    controls.wpad1.bHeld |= WPAD_BUTTON_1;
                     gunstick.state = WII_GUNSTICK_SHOOT; //prepare detect...
                 }
             }
@@ -684,7 +684,7 @@ unsigned char Wiimote_CheckGun (void)
     else if((GetTicks()-gunstick.timer) > WII_GUNSTICK_TIMER) //si han pasado...
         gunstick.state = WII_GUNSTICK_SLEEP;
     else if(__gunstick_checkHit())
-        return 0xfd; //joy abajo
+        return 0xfc; //joy abajo + arriba phaser - test
 
     return 0xff; //nada
 }
@@ -707,7 +707,7 @@ bool __gunstick_checkHit (void)
 
     gcolor = GetXYScreen (gunstick.x, gunstick.y);
 
-    if(gcolor == gunstick.hcolor ) // blanco?
+    if(gcolor == gunstick.hcolor ) // blanco? - todo!
         return true;
 
     return false;
