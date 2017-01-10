@@ -61,128 +61,111 @@ void _btnCreate (t_button * button, t_infnode * ginfo);
 bool XML_loadGameList(char * xmldata, t_fslist * gamelist);
 bool XML_saveGameList(char * filename, t_fslist * gamelist);
 
-void FileList_rClean (t_fslist * filenames)
-{
-   if(filenames->fnext != NULL){
-      FileList_rClean(filenames->fnext);
+void FileList_rClean (t_fslist * filenames) {
+    if(filenames->fnext != NULL) {
+        FileList_rClean(filenames->fnext);
 
-      free(filenames->fnext);
-      filenames->fnext = NULL;
-   }
-
+        free(filenames->fnext);
+        filenames->fnext = NULL;
+    }
 }
 
-void FileList_Init (t_fslist * filenode){
+void FileList_Init (t_fslist * filenode) {
 
-        memset (&filenode->game, 0, sizeof(t_infnode));
+    memset (&filenode->game, 0, sizeof(t_infnode));
     filenode->gfile.filename[0] = 0;
-        filenode->gfile.location = SU_NONE;
+    filenode->gfile.location = SU_NONE;
     filenode->favorite = 0;
-        //memset (filenode->binds, 0xff, MAX_CPCBUTTONS * 2);
-        memcpy(filenode->binds, buttons_def, MAX_CPCBUTTONS * 2);
+    //memset (filenode->binds, 0xff, MAX_CPCBUTTONS * 2);
+    memcpy(filenode->binds, buttons_def, MAX_CPCBUTTONS * 2);
 
     filenode->fnext = NULL;
-
 }
 
-void _FileList_Swap(t_fslist * pre, t_fslist * current)
-{
+void _FileList_Swap(t_fslist * pre, t_fslist * current) {
 
-   t_fslist temp;
-   FileList_Init(&temp); 
+    t_fslist temp;
+    FileList_Init(&temp); 
 
-   memcpy(&temp, pre, sizeof(t_fslist));
-   memcpy(pre, current, sizeof(t_fslist));
+    memcpy(&temp, pre, sizeof(t_fslist));
+    memcpy(pre, current, sizeof(t_fslist));
 
-   //pointers
-   pre->fnext = temp.fnext;
-   temp.fnext = current->fnext;
+    //pointers
+    pre->fnext = temp.fnext;
+    temp.fnext = current->fnext;
 
-   memcpy(current, &temp, sizeof(t_fslist));
-
+    memcpy(current, &temp, sizeof(t_fslist));
 }
 
-void FileList_OrderbyName(t_fslist * filenames)
-{
-   t_fslist * pre = filenames;
-   t_fslist * current = filenames->fnext;
+void FileList_OrderbyName(t_fslist * filenames) {
+    t_fslist * pre = filenames;
+    t_fslist * current = filenames->fnext;
 
-   int result = 0;
-   bool moved = false;    
+    int result = 0;
+    bool moved = false;    
 
-   while( 1 )
-   {
+    while( 1 ) {
+        while ( current->fnext != NULL) {
+            result = strncmp(pre->game.title, current->game.title, 128);
 
-     while ( current->fnext != NULL)
-     {
-    result = strncmp(pre->game.title, current->game.title, 128);
-
-    if(result == 0)
-        { //delete!
-        if(memcmp(&pre->gfile, &current->gfile, sizeof(t_WiiRom)) == 0)
-        {
-            pre->fnext = current->fnext;
-            free(current);
-            current = pre->fnext;
-        }
+            if(result == 0) { //delete!
+                if(memcmp(&pre->gfile, &current->gfile, sizeof(t_WiiRom)) == 0) {
+                    pre->fnext = current->fnext;
+                    free(current);
+                    current = pre->fnext;
+                }
         
-    } 
-    else if(result > 0)
-    { //move!
-        _FileList_Swap(pre, current);
-        moved = true;
+            } else if(result > 0) { //move!
+                _FileList_Swap(pre, current);
+                moved = true;
+            }
+
+            current = current->fnext;
+            pre = pre->fnext;
+        }
+
+        if(moved == true) { //re-init
+            moved = false;
+            pre = filenames;
+            current = filenames->fnext;
+        } else //no changes -> end!
+            break;
     }
 
-    current = current->fnext;
-    pre = pre->fnext;
-
-     }
-
-     if(moved == true){ //re-init
-    moved = false;
-        pre = filenames;
-        current = filenames->fnext;
-     }else //no changes -> end!
-    break;
-  }
-
 }
 
-void Explorer_rebuildRoms (const t_fslist * filenames)
-{
-   t_fslist * nnode = (t_fslist *) filenames;
-   t_fslist * tmpnode = NULL;
+void Explorer_rebuildRoms (const t_fslist * filenames) {
+    t_fslist * nnode = (t_fslist *) filenames;
+    t_fslist * tmpnode = NULL;
 
-   WiiStatus.nRoms = 0;
+    WiiStatus.nRoms = 0;
 
-   while(nnode->fnext != NULL){ //cuenta numero de roms
+    while(nnode->fnext != NULL) { //cuenta numero de roms
 
-    if(nnode->gfile.location == 0)
-    {
-        tmpnode = nnode->fnext;
+        if(nnode->gfile.location == 0) {
+            tmpnode = nnode->fnext;
 
-        if(tmpnode->fnext == NULL){
-            FileList_Init(nnode);
-            free(tmpnode);
-            return;
-        }else{
-            memcpy(nnode, tmpnode, sizeof(t_fslist));
-            free(tmpnode);
-        }
+            if(tmpnode->fnext == NULL) {
+                FileList_Init(nnode);
+                free(tmpnode);
+                return;
+            } else {
+                memcpy(nnode, tmpnode, sizeof(t_fslist));
+                free(tmpnode);
+            }
         
-    }
+        }
 
-    nnode = nnode->fnext;
+        nnode = nnode->fnext;
 
         //TODO: AÑADIR SOLO ROM+ SI location != 0 :)
-          WiiStatus.nRoms++;
+        WiiStatus.nRoms++;
    }
 
 }
 
 
-bool Explorer_XMLread (char * device, t_fslist * filenames)
-{
+bool Explorer_XMLread (char * device, t_fslist * filenames) {
     t_fslist * nnode= filenames;
 
     char temp[1024]= "";
@@ -195,9 +178,8 @@ bool Explorer_XMLread (char * device, t_fslist * filenames)
     strcat(temp, CPC_FILEDIR);
     strcat(temp, "/wiituka_romcache.xml");
 
-    if(!fileRead (&file, temp )){ //carga el XML en memoria
+    if(!fileRead (&file, temp )) //carga el XML en memoria
         return false;
-    }
 
     if(nnode->fnext != NULL) //comprueba que la lista esta vacia :-
         FileList_rClean(filenames);
@@ -210,8 +192,7 @@ bool Explorer_XMLread (char * device, t_fslist * filenames)
 }
 
 
-bool Explorer_XMLsave (char * device, t_fslist * filenames)
-{
+bool Explorer_XMLsave (char * device, t_fslist * filenames) {
     char temp[1024]= "";
 
     strcpy(temp, device);
@@ -225,61 +206,52 @@ bool Explorer_XMLsave (char * device, t_fslist * filenames)
 
 }
 
-bool _FileList_UpdateFile(const char * filename, enum support_type nloc )
-{
+bool _FileList_UpdateFile(const char * filename, enum support_type nloc ) {
     t_fslist * pnode = &gamelist;
 
-    while ( pnode->fnext != NULL)
-    {
+    while ( pnode->fnext != NULL) {
 
-        if( (strncmp(filename, pnode->gfile.filename, 256) == 0) )
-    {
-        pnode->gfile.location = nloc;
+        if( (strncmp(filename, pnode->gfile.filename, 256) == 0) ) {
+            pnode->gfile.location = nloc;
             return true;
-    }
-    
-    pnode = pnode->fnext;
+        }
 
+        pnode = pnode->fnext;
     }
-
     return false;
 }
 
 /*
  * Inserta el juego en gamelist ordenado segun nombre.
  */
-bool _FileList_InsertGame (const t_fslist * nfile)
-{
+bool _FileList_InsertGame (const t_fslist * nfile) {
     t_fslist * pnode = &gamelist;
     int result;
 
-    while ( pnode->fnext != NULL)
-    {
-        if( (strncmp(nfile->gfile.filename, pnode->gfile.filename, 256) != 0) )
-        {
-        result = strncmp(nfile->game.title, pnode->game.title, 128);
+    while ( pnode->fnext != NULL) {
+        if( (strncmp(nfile->gfile.filename, pnode->gfile.filename, 256) != 0) ) {
+            result = strncmp(nfile->game.title, pnode->game.title, 128);
 
-        if(result == 0){
+            if(result == 0) {
                 if ((nfile->gfile.location == SU_SD) 
-                && ((pnode->gfile.location == SU_NONE) || (pnode->gfile.location == SU_HTTP) ))
-            {
-                memcpy(&pnode->gfile, &nfile->gfile, sizeof(t_WiiRom));
-                return true;
+                    && ((pnode->gfile.location == SU_NONE) || (pnode->gfile.location == SU_HTTP) ))
+                {
+                    memcpy(&pnode->gfile, &nfile->gfile, sizeof(t_WiiRom));
+                    return true;
+                }
+                break;
             }
-            break;
-        }
         
-        if(result < 0)
-            break;
+            if(result < 0)
+                break;
 
-    }else if(nfile->gfile.location == SU_SD)
-    {
-         if((pnode->gfile.location == SU_NONE) || (pnode->gfile.location == SU_HTTP) )
-            pnode->gfile.location = SU_SD;
-        return true;
-    }
+        } else if(nfile->gfile.location == SU_SD) {
+            if((pnode->gfile.location == SU_NONE) || (pnode->gfile.location == SU_HTTP) )
+                pnode->gfile.location = SU_SD;
+            return true;
+        }
 
-    pnode = pnode->fnext;
+        pnode = pnode->fnext;
 
     }
 
@@ -288,12 +260,11 @@ bool _FileList_InsertGame (const t_fslist * nfile)
     //creamos
     newnode = malloc(sizeof(t_fslist));
     if(newnode == NULL)
-    return false;
+        return false;
 
-    if( pnode->fnext != NULL)
-    {      //copiamos los datos
+    if( pnode->fnext != NULL) {      //copiamos los datos
         memcpy(newnode, pnode, sizeof(t_fslist));
-    }else
+    } else
         FileList_Init (newnode);
 
     //copiamos los datos del nuevo
@@ -305,8 +276,7 @@ bool _FileList_InsertGame (const t_fslist * nfile)
 }
 
 
-bool Explorer_XMLNETread( void )
-{
+bool Explorer_XMLNETread( void ) {
     t_fslist tmp_list = { 
             {"", SU_NONE}, 
             { "", "", "", "", ""}, 0, 
@@ -345,7 +315,7 @@ bool Explorer_XMLNETread( void )
         {
             result = true;
             fileSize = net_get_buffersize();
-               if(fileSize > 0) {
+            if(fileSize > 0) {
                 cad = (void *) malloc(fileSize + 1); 
                 if(cad != NULL)
                     strncpy(cad, (char*) net_get_charbuffer(), fileSize);
@@ -382,8 +352,7 @@ bool Explorer_XMLNETread( void )
   return true;
 }
 
-bool Explorer_dirRead ( void )
-{
+bool Explorer_dirRead ( void ) {
     int ngames = 0;
 
     DIR *pdir;
@@ -391,15 +360,14 @@ bool Explorer_dirRead ( void )
     struct dirent *pent;
     t_fslist pnode;
 
-    if(!WiiStatus.Dev_Fat){
+    if(!WiiStatus.Dev_Fat) {
         return false;
     }
 
     pdir=opendir(current_path);
 
     if (!pdir) {
-           printf ("opendir() failure; terminating\n");
-           
+        printf ("opendir() failure; terminating\n");
         return false;
     }
 
@@ -408,7 +376,7 @@ bool Explorer_dirRead ( void )
         stat(pent->d_name,&statbuf);
         
         if(S_ISDIR(statbuf.st_mode))
-               continue;
+            continue;
 
         if(strlen(current_path) + strlen(pent->d_name) >= 1024)
             continue; //path demasiado largo, saltamos
@@ -439,111 +407,103 @@ bool Explorer_dirRead ( void )
 
 void _nfoRead(t_infnode * ginfo, char * filename) //añadir modo online
 {
-   char path[1024]= "";
-   t_filebuf file;
-   t_zip_info zinfo;
-   int iErrorCode = 0;
+    char path[1024]= "";
+    t_filebuf file;
+    t_zip_info zinfo;
+    int iErrorCode = 0;
 
-   strncpy(ginfo->title, filename, 127); //minimo
+    strncpy(ginfo->title, filename, 127); //minimo
 
-   strcpy(path, current_path); 
-   strcat(path, filename);
+    strcpy(path, current_path); 
+    strcat(path, filename);
 
-   if(!fileRead (&file, path ))
-     return;
+    if(!fileRead (&file, path ))
+        return;
 
-   zinfo.pchFileNames = NULL;
-   zinfo.pchZipFile = NULL;
-   zinfo.pchExtension = ".diz";
+    zinfo.pchFileNames = NULL;
+    zinfo.pchZipFile = NULL;
+    zinfo.pchExtension = ".diz";
 
 
 
-   if ((iErrorCode = zipBuffered_dir(file.buffer, file.size, &zinfo))){
-       if(iErrorCode != 15)
-             sprintf(debugt,"Zdir: Err: %i (%s-%i)" ,iErrorCode, filename, file.size);
+    if ((iErrorCode = zipBuffered_dir(file.buffer, file.size, &zinfo))) {
+        if(iErrorCode != 15)
+            sprintf(debugt,"Zdir: Err: %i (%s-%i)" ,iErrorCode, filename, file.size);
 
-       free(file.buffer);
-       return;
-   }
+        free(file.buffer);
+        return;
+    }
 
-   if (zinfo.unZipSize > 0){
+    if (zinfo.unZipSize > 0) {
+        unsigned char * ebuffer = NULL; 
+        ebuffer = malloc (zinfo.unZipSize); //Using Zip Info for extract
 
-       unsigned char * ebuffer = NULL; 
-       ebuffer = malloc (zinfo.unZipSize); //Using Zip Info for extract
+        if(ebuffer == NULL){
+            free(file.buffer);
+            return;
+        }
 
-       if(ebuffer == NULL){
-           free(file.buffer);
-       return;
-       }
+        if (!(iErrorCode = zipBuffered_extract( ebuffer, file.buffer, zinfo.dwOffset))) {
+            _nfoParse(ginfo, (char *) ebuffer, zinfo.unZipSize);
+        }
 
-       if (!(iErrorCode = zipBuffered_extract( ebuffer, file.buffer, zinfo.dwOffset))) {
-           _nfoParse(ginfo, (char *) ebuffer, zinfo.unZipSize);
-       }
+        free(ebuffer);
+    }
 
-       free(ebuffer);
-   }
+    free(file.buffer);
 
-   free(file.buffer);
+    if (zinfo.pchFileNames) {
+        free(zinfo.pchFileNames);
+    }
 
-   if (zinfo.pchFileNames) {
-      free(zinfo.pchFileNames);
-   }
-
-  // sprintf(debugt,"t%sg%sc%sl%sy%s",ginfo->title, ginfo->genre, ginfo->company, ginfo->lang, ginfo->year);
+    // sprintf(debugt,"t%sg%sc%sl%sy%s",ginfo->title, ginfo->genre, ginfo->company, ginfo->lang, ginfo->year);
 
 }
 
 
 void _nfoParse(t_infnode * ginfo, char * buffer, int bsize)
 {
-  int ps, n, cp;
-  int nSize = 0;
-  int cMax = 0;
-  char * cbuffer = NULL;
+    int ps, n, cp;
+    int nSize = 0;
+    int cMax = 0;
+    char * cbuffer = NULL;
 
-  char ltoken[5][10] = {"TITLE:", "TYPE:", "COMPANY:", "LANGUAGE:", "YEAR:" };
+    char ltoken[5][10] = {"TITLE:", "TYPE:", "COMPANY:", "LANGUAGE:", "YEAR:" };
 
-  for(n = 0; n < 5; n++){
+    for(n = 0; n < 5; n++) {
 
-    nSize = strlen(ltoken[n]);
-    cMax = 0;
-    cbuffer = NULL;
+        nSize = strlen(ltoken[n]);
+        cMax = 0;
+        cbuffer = NULL;
    
 
-    switch (n)
-    {
-       case 0: cbuffer = ginfo->title; cMax = 128; break;
-       case 1: cbuffer = ginfo->genre; cMax = 128; break;
-       case 2: cbuffer = ginfo->company; cMax = 28; break;
-       case 3: cbuffer = ginfo->lang; cMax = 28; break;
-       case 4: cbuffer = ginfo->year; cMax = 5; break;
+        switch (n) {
+            case 0: cbuffer = ginfo->title; cMax = 128; break;
+            case 1: cbuffer = ginfo->genre; cMax = 128; break;
+            case 2: cbuffer = ginfo->company; cMax = 28; break;
+            case 3: cbuffer = ginfo->lang; cMax = 28; break;
+            case 4: cbuffer = ginfo->year; cMax = 5; break;
+        }
+
+        for(ps = 0; ps < (bsize - nSize); ps ++) {
+            if(memcmp(&buffer[ps], ltoken[n], nSize)!=0)
+                continue; //no son iguales +1
+
+            ps+=nSize;
+
+            while((ps < bsize) && (buffer[ps] == ' ')) ps++;
+
+            for(cp = 0; (cp < cMax) && (ps < bsize) && (buffer[ps] != 0x0d); ps++) {
+                if(buffer[ps]!='"') {
+                    cbuffer[cp] = buffer[ps];
+                    cp++;
+                }
+                
+            }
+            cbuffer[cp] = '\0';
+        }
+        lowercase(cbuffer, true); //Primera mayus.
     }
-
-    for(ps = 0; ps < (bsize - nSize); ps ++)
-    {
-       if(memcmp(&buffer[ps], ltoken[n], nSize)!=0)
-          continue; //no son iguales +1
-
-       ps+=nSize;
-
-       while((ps < bsize) && (buffer[ps] == ' ')) ps++;
-
-       for(cp = 0; (cp < cMax) && (ps < bsize) && (buffer[ps] != 0x0d); ps++)
-       {
-          if(buffer[ps]!='"')
-          {
-            cbuffer[cp] = buffer[ps];
-            cp++;
-          }
-            
-       }
-       cbuffer[cp] = '\0';
-    }
-    
-    lowercase(cbuffer, true); //Primera mayus.
-
-  }
-
 }
 
 bool Explorer_LoadFilelist(char * path)
@@ -575,7 +535,7 @@ bool Explorer_LoadFilelist(char * path)
 
     if(WiiStatus.UpdateDIR) {
         if(!Explorer_dirRead()) {
-              sprintf(debugt,"DEBUG: Exploracion erronea!" );
+            sprintf(debugt,"DEBUG: Exploracion erronea!" );
             error++;
         }
         WiiStatus.UpdateDIR = 0;
