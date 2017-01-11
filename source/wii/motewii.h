@@ -64,6 +64,8 @@ void WiimoteLoadKeys(void);
 #define WII_GUNSTICK_SHOOT    1
 #define WII_GUNSTICK_XYGET    2
 #define WII_GUNSTICK_SSEND    3
+#define WII_GUNSTICK_PREPARE  4
+
 #define WII_GUNSTICK_TIMER    500
 #define WII_GUNSTICK_HITCOLOR 0xc658
 #define WII_GUNSTICK_HITGREEN 0x4a0

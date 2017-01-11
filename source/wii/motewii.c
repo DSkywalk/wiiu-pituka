@@ -512,7 +512,7 @@ void poll_wiimote(void)
 
             }
 
-            if( (WiiStatus.Gunstick == false) ) 
+            if( (!WiiStatus.Gunstick) ) 
             {
                 if(screen_y)
                 {
@@ -550,8 +550,8 @@ void poll_wiimote(void)
             }
             else
             {
-                if (controls.wpad1.bHeld & (  WPAD_BUTTON_B)){ // WPAD_BUTTON_A
-                    controls.wpad1.bHeld |= WPAD_BUTTON_1;
+                if (controls.wpad1.bDown & ( WPAD_BUTTON_B)){ // WPAD_BUTTON_A - solo al disparar (bDown)
+                    controls.wpad1.bHeld |= WPAD_BUTTON_2; // 2 - gunstick - 1 - phaser
                     gunstick.state = WII_GUNSTICK_SHOOT; //prepare detect...
                 }
             }
@@ -664,7 +664,7 @@ void WiimoteSetupGun( int Init)
     }
 
     if(!WiitukaXML.scrtube)
-        gunstick.hcolor = WII_GUNSTICK_MINCOLOR; //WII_GUNSTICK_HITCOLOR;
+        gunstick.hcolor = WII_GUNSTICK_HITCOLOR; //WII_GUNSTICK_MINCOLOR;
     else
         gunstick.hcolor = WII_GUNSTICK_HITGREEN;
 
@@ -688,7 +688,7 @@ unsigned char Wiimote_CheckGun (void)
     else if((GetTicks()-gunstick.timer) > WII_GUNSTICK_TIMER) //si han pasado...
         gunstick.state = WII_GUNSTICK_SLEEP;
     else if(__gunstick_checkHit())
-        return 0xfe; //joy arriba phaser fe
+        return 0xfd; //joy arriba phaser fe / gunstick fd
 
     return 0xff; //nada
 }
@@ -711,7 +711,12 @@ inline bool __gunstick_checkHit (void)
 
     gcolor = GetXYScreen (gunstick.x, gunstick.y);
 
-    if(gcolor > gunstick.hcolor ){ // blanco? - todo!
+    if(!gcolor)
+        gunstick.state = WII_GUNSTICK_PREPARE;
+
+    //if(gcolor > gunstick.hcolor ){ // blanco? - todo!
+    if((gunstick.state != WII_GUNSTICK_PREPARE) && 
+       (gcolor == gunstick.hcolor)) {
         spool = 1;
         sprintf(spool_cad, "get: %x", gcolor);
         return true;
